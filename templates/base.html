@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7f9">
+    <title>{% block title %}NewsLens{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="site-shell">
+        <header class="site-header">
+            <nav class="site-nav" aria-label="Main navigation">
+                <a class="brand" href="{{ url_for('index') }}" aria-label="NewsLens home">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 32 32" fill="none">
+                            <path d="M16 3.5 27 8v7.2c0 6.4-4.3 11.1-11 13.3C9.3 26.3 5 21.6 5 15.2V8l11-4.5Z" stroke="currentColor" stroke-width="1.7"/>
+                            <path d="M11.5 15.7h9M16 11.2v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="brand-copy">
+                        <strong>NewsLens</strong>
+                        <small>Bilingual news analysis</small>
+                    </span>
+                </a>
+
+                <div class="nav-links">
+                    <a class="nav-link {% if request.endpoint == 'index' %}is-active{% endif %}"
+                       href="{{ url_for('index') }}"
+                       {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>
+                        Detect
+                    </a>
+                    <a class="nav-link {% if request.endpoint == 'history' %}is-active{% endif %}"
+                       href="{{ url_for('history') }}"
+                       {% if request.endpoint == 'history' %}aria-current="page"{% endif %}>
+                        History
+                    </a>
+                    <a class="nav-link {% if request.endpoint == 'performance' %}is-active{% endif %}"
+                       href="{{ url_for('performance') }}"
+                       {% if request.endpoint == 'performance' %}aria-current="page"{% endif %}>
+                        Performance
+                    </a>
+                </div>
+            </nav>
+        </header>
+
+        <main class="page-container">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="site-footer">
+            <span class="footer-mark" aria-hidden="true">N</span>
+            <span>NewsLens <span class="footer-divider">·</span> Model-assisted analysis, not a fact-check.</span>
+        </footer>
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

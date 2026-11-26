@@ -1,0 +1,33 @@
+# Environments
+.venv/
+.venv*/
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Database
+database.db
+*.sqlite3
+
+# Large Model weights & zip archives (> 100MB GitHub limit)
+*.zip
+*.tar.gz
+*.7z
+models/bangla_bert/model.safetensors
+models/bangla_bert/training_args.bin
+models/deep_learning/*.keras
+
+# Large processed datasets (> 100MB GitHub limit)
+dataset/cleaned/cleaned_master.csv
+dataset/processed/processed_master.csv
+
+# Temporary / Scratch files
+scratch/
+.system_generated/
+*.log

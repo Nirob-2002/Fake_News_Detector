@@ -1,0 +1,204 @@
+
+{% extends "base.html" %}
+
+{% block title %}Detect news · NewsLens{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <div class="hero-copy">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> BILINGUAL NEWS ANALYSIS</span>
+            <h1>Check a news article<br><span>before you share it.</span></h1>
+            <p>Paste the full text for an English or Bangla model-assisted assessment. Always verify important claims with a trusted source.</p>
+            <div class="hero-tags">
+                <span class="hero-tag"><span class="tag-dot tag-dot-blue"></span> English</span>
+                <span class="hero-tag"><span class="tag-dot tag-dot-coral"></span> বাংলা</span>
+                <span class="hero-tag">Up to 30,000 characters</span>
+            </div>
+        </div>
+        <aside class="hero-status" aria-label="System status">
+            <span class="status-label">Analysis engine</span>
+            <strong>Ready</strong>
+            <p>English · Bangla</p>
+        </aside>
+    </section>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-stack" role="alert">
+                {% for message in messages %}
+                    <p class="flash-message"><span aria-hidden="true">!</span>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="workspace-grid">
+        <div class="surface input-surface">
+            <div class="surface-heading">
+                <div>
+                    <span class="step-label">YOUR ARTICLE</span>
+                    <h2>Start an analysis</h2>
+                </div>
+                <span class="step-number">01</span>
+            </div>
+
+            <form method="POST" action="{{ url_for('index') }}" id="detect-form">
+                <label class="field-label" for="language">Article language</label>
+                <div class="select-wrap">
+                    <select name="language" id="language">
+                        <option value="English" {% if selected_language == "English" %}selected{% endif %}>English</option>
+                        <option value="Bangla" {% if selected_language == "Bangla" %}selected{% endif %}>বাংলা (Bangla)</option>
+                    </select>
+                    <span class="select-chevron" aria-hidden="true">⌄</span>
+                </div>
+                <p class="field-hint">Bangla articles are analyzed with the fine-tuned BanglaBERT transformer model (with optimized SVM fallback).</p>
+
+                <div class="field-label-row">
+                    <label class="field-label" for="news_text">News article</label>
+                    <div class="article-field-actions">
+                        <span class="character-count" id="character-count">0 / 30,000</span>
+                        <button
+                            class="refresh-button"
+                            id="clear-article"
+                            type="button"
+                            title="Clear news article"
+                            aria-label="Clear news article"
+                        >
+                            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                                <path d="M4.2 6.8A6 6 0 1 1 4 13.1M4.2 6.8V3.5m0 3.3h3.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <textarea
+                    name="news_text"
+                    id="news_text"
+                    rows="9"
+                    maxlength="30000"
+                    dir="auto"
+                    placeholder="Paste the full article here..."
+                    required>{{ news_text|default('', true) }}</textarea>
+
+                <div class="form-footer">
+                    <span class="form-note"><span class="note-icon" aria-hidden="true">↗</span> Longer context can help the model assess the article.</span>
+                    <button class="primary-button" type="submit">
+                        <span>Analyze article</span>
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <aside class="surface guide-surface">
+            <div class="guide-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                    <path d="M24 5 40 11v10.5c0 9.4-6.3 16.3-16 19.5C14.3 37.8 8 30.9 8 21.5V11l16-6Z" fill="currentColor" opacity=".12"/>
+                    <path d="M24 5 40 11v10.5c0 9.4-6.3 16.3-16 19.5C14.3 37.8 8 30.9 8 21.5V11l16-6Z" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="m17.5 23 4.2 4.2 9-9.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <span class="step-label">A THOUGHTFUL CHECK</span>
+            <h2>How to read the result</h2>
+            <p class="guide-intro">The model provides a signal based on its training data. It does not independently verify facts.</p>
+            <div class="guide-steps">
+                <div class="guide-step">
+                    <span class="guide-step-index">1</span>
+                    <div><strong>Review the signal</strong><small>See which model and score were used.</small></div>
+                </div>
+                <div class="guide-step">
+                    <span class="guide-step-index">2</span>
+                    <div><strong>Check the source</strong><small>Compare with trusted, independent reporting.</small></div>
+                </div>
+                <div class="guide-step">
+                    <span class="guide-step-index">3</span>
+                    <div><strong>Use your judgment</strong><small>Do not treat a model result as proof.</small></div>
+                </div>
+            </div>
+            <div class="guide-footnote"><span aria-hidden="true">✦</span> Designed for English and Bangla news</div>
+        </aside>
+    </section>
+
+    {% if result %}
+        <section class="result-surface result-{{ result.prediction|lower }}" role="status" aria-live="polite">
+            <div class="result-heading">
+                <div class="verdict-icon" aria-hidden="true">
+                    {% if result.prediction == "Fake" %}
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M12 8v5m0 3.5h.01M10.3 3.8 1.9 18.3A1.9 1.9 0 0 0 3.5 21h17a1.9 1.9 0 0 0 1.6-2.7L13.7 3.8a1.95 1.95 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    {% else %}
+                        <svg viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    {% endif %}
+                </div>
+                <div class="result-title">
+                    <span class="step-label">MODEL ASSESSMENT</span>
+                    <h2>{{ result.prediction }} news signal</h2>
+                    <p>This is an automated prediction, not a confirmed fact-check.</p>
+                </div>
+                <span class="verdict-pill">{{ result.prediction }}</span>
+            </div>
+
+            <div class="result-details">
+                <div class="result-detail">
+                    <span>Model used</span>
+                    <strong>{{ "Optimized SVM" if result.model_name == "SVM" else result.model_name }}</strong>
+                </div>
+                {% if result.model_name == "SVM" %}
+                    <div class="result-detail">
+                        <span>Decision score</span>
+                        <strong>{{ "%.4f"|format(result.raw_score) }}</strong>
+                    </div>
+                    <div class="result-detail">
+                        <span>Decision threshold</span>
+                        <strong>{{ "%.2f"|format(result.threshold) }}</strong>
+                    </div>
+                    <p class="score-disclaimer">SVM scores are not probabilities or confidence percentages.</p>
+                {% else %}
+                    <div class="result-detail">
+                        <span>Fake-class model score</span>
+                        <strong>{{ "%.2f"|format(result.fake_probability * 100) }}%</strong>
+                    </div>
+                    <div class="result-detail">
+                        <span>Decision threshold</span>
+                        <strong>{{ "%.2f"|format(result.threshold) }}</strong>
+                    </div>
+                    <p class="score-disclaimer">Model scores are not calibrated certainty estimates.</p>
+                {% endif %}
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const articleInput = document.getElementById("news_text");
+    const characterCount = document.getElementById("character-count");
+    const clearArticleButton = document.getElementById("clear-article");
+    const detectForm = document.getElementById("detect-form");
+    const submitButton = detectForm ? detectForm.querySelector('button[type="submit"]') : null;
+
+    if (articleInput && characterCount) {
+        const updateCharacterCount = () => {
+            characterCount.textContent =
+                `${articleInput.value.length.toLocaleString()} / 30,000`;
+        };
+        articleInput.addEventListener("input", updateCharacterCount);
+        updateCharacterCount();
+    }
+
+    if (articleInput && clearArticleButton) {
+        clearArticleButton.addEventListener("click", () => {
+            articleInput.value = "";
+            articleInput.dispatchEvent(new Event("input"));
+            articleInput.focus();
+        });
+    }
+
+    if (detectForm && submitButton) {
+        detectForm.addEventListener("submit", () => {
+            submitButton.disabled = true;
+            submitButton.innerHTML = "<span>Analyzing article...</span>";
+        });
+    }
+</script>
+{% endblock %}

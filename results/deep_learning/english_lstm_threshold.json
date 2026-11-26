@@ -1,0 +1,11 @@
+{
+    "language": "English",
+    "model": "LSTM",
+    "threshold": 0.79,
+    "validation_precision_fake": 0.970193740685544,
+    "validation_recall_fake": 0.9630177514792899,
+    "validation_fake_f1": 0.9665924276169265,
+    "minimum_precision_recall_constraint": 0.6,
+    "positive_class": "Fake",
+    "negative_class": "Real"
+}

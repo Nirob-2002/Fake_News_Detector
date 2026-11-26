@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}History · NewsLens{% endblock %}
+
+{% block content %}
+    <section class="page-intro">
+        <div>
+            <span class="eyebrow"><span class="eyebrow-dot"></span> YOUR WORKSPACE</span>
+            <h1>Detection <span>history</span></h1>
+            <p>Revisit your latest article assessments and the model signals behind them.</p>
+        </div>
+        <a class="secondary-button" href="{{ url_for('index') }}">
+            <span aria-hidden="true">＋</span> New analysis
+        </a>
+    </section>
+
+    <section class="summary-grid" aria-label="History summary">
+        <article class="summary-card">
+            <span class="summary-icon summary-icon-blue" aria-hidden="true">▤</span>
+            <div><span>Recent analyses</span><strong>{{ summary.total }}</strong><small>Latest 100 records</small></div>
+        </article>
+        <article class="summary-card">
+            <span class="summary-icon summary-icon-coral" aria-hidden="true">!</span>
+            <div><span>Fake signals</span><strong>{{ summary.fake }}</strong><small>Model-flagged articles</small></div>
+        </article>
+        <article class="summary-card">
+            <span class="summary-icon summary-icon-green" aria-hidden="true">✓</span>
+            <div><span>Real signals</span><strong>{{ summary.real }}</strong><small>Model-classified articles</small></div>
+        </article>
+    </section>
+
+    <section class="history-section">
+        <div class="section-title-row">
+            <div>
+                <span class="step-label">RECENT ACTIVITY</span>
+                <h2>Your latest scans</h2>
+            </div>
+            <span class="count-pill">{{ records|length }} records</span>
+        </div>
+
+        {% for item in records %}
+            <article class="history-card">
+                <div class="history-accent history-accent-{{ item.prediction|lower }}"></div>
+                <div class="history-content">
+                    <div class="history-topline">
+                        <div class="history-badges">
+                            <span class="language-pill">{{ "বাংলা" if item.language == "Bangla" else item.language }}</span>
+                            <span class="verdict-pill verdict-pill-small verdict-{{ item.prediction|lower }}">{{ item.prediction }} signal</span>
+                        </div>
+                        <time datetime="{{ item.created_at }}">{{ item.created_at }}</time>
+                    </div>
+                    <p class="history-excerpt" dir="auto">{{ item.news_text[:320] }}{% if item.news_text|length > 320 %}…{% endif %}</p>
+                    <div class="history-meta">
+                        <span><i class="meta-dot"></i>{{ "Optimized SVM" if item.model_name == "SVM" else item.model_name }}</span>
+                        {% if item.model_name == "SVM" %}
+                            <span>Score <strong>{{ "%.4f"|format(item.raw_score) }}</strong></span>
+                            <span>Threshold <strong>{{ "%.2f"|format(item.threshold) }}</strong></span>
+                        {% else %}
+                            <span>Model score <strong>{{ "%.1f"|format(item.confidence * 100) }}%</strong></span>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+        {% else %}
+            <div class="empty-state">
+                <span class="empty-icon" aria-hidden="true">◷</span>
+                <h3>No analyses yet</h3>
+                <p>Your recent model assessments will appear here.</p>
+                <a class="secondary-button" href="{{ url_for('index') }}">Analyze an article</a>
+            </div>
+        {% endfor %}
+    </section>
+{% endblock %}

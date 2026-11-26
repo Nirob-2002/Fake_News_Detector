@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Performance · NewsLens{% endblock %}
+
+{% block content %}
+    <section class="page-intro performance-intro">
+        <div>
+            <span class="eyebrow"><span class="eyebrow-dot"></span> MODEL LAB</span>
+            <h1>Performance <span>overview</span></h1>
+            <p>Compare model behavior on held-out test data. These scores describe dataset performance, not certainty about an individual article.</p>
+        </div>
+        <div class="benchmark-badge">HELD-OUT BENCHMARKS</div>
+    </section>
+
+    <div class="chart-note">
+        <span class="chart-note-icon" aria-hidden="true">i</span>
+        <p>Bars are normalized to 100%. Fake precision measures how often Fake predictions were correct; Fake recall measures how many Fake examples the model found.</p>
+    </div>
+
+    <section class="performance-grid" aria-label="Model performance charts">
+        {% for item in records %}
+            <article class="performance-card {% if item.Is_Active or ('(Active)' in item.Model) %}is-featured{% endif %}">
+                <div class="performance-card-header">
+                    <div>
+                        <span class="step-label">{{ item.Language }} MODEL</span>
+                        <h2>{{ item.Model }}</h2>
+                    </div>
+                    {% if item.Is_Active or ('(Active)' in item.Model) %}
+                        <span class="recommended-pill"><span></span> SERVING MODEL</span>
+                    {% else %}
+                        <span class="evaluation-pill">{{ item.Evaluation_Set|default('Held-out test') }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="accuracy-highlight">
+                    <div>
+                        <span class="metric-overline">OVERALL ACCURACY</span>
+                        <strong>{{ "%.1f"|format(item.Accuracy * 100) }}<small>%</small></strong>
+                        <span class="accuracy-caption">on the held-out test set</span>
+                    </div>
+                    <div class="accuracy-ring" role="img" aria-label="Accuracy {{ (item.Accuracy * 100)|round(1) }} percent">
+                        <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
+                            <circle class="ring-track" cx="21" cy="21" r="16" pathLength="100"></circle>
+                            <circle class="ring-value" cx="21" cy="21" r="16" pathLength="100" stroke-dasharray="{{ (item.Accuracy * 100)|round(1) }} 100"></circle>
+                        </svg>
+                        <span>{{ "%.0f"|format(item.Accuracy * 100) }}<small>%</small></span>
+                    </div>
+                </div>
+
+                <div class="metric-chart">
+                    <div class="chart-row">
+                        <div class="chart-row-heading"><span>Fake precision</span><strong>{{ "%.1f"|format(item.Precision_Fake * 100) }}%</strong></div>
+                        <progress class="metric-progress bar-precision" aria-label="Fake precision" max="1" value="{{ item.Precision_Fake }}">{{ "%.1f"|format(item.Precision_Fake * 100) }}%</progress>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-row-heading"><span>Fake recall</span><strong>{{ "%.1f"|format(item.Recall_Fake * 100) }}%</strong></div>
+                        <progress class="metric-progress bar-recall" aria-label="Fake recall" max="1" value="{{ item.Recall_Fake }}">{{ "%.1f"|format(item.Recall_Fake * 100) }}%</progress>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-row-heading"><span>Fake F1 score</span><strong>{{ "%.1f"|format(item.F1_Fake * 100) }}%</strong></div>
+                        <progress class="metric-progress bar-f1" aria-label="Fake F1 score" max="1" value="{{ item.F1_Fake }}">{{ "%.1f"|format(item.F1_Fake * 100) }}%</progress>
+                    </div>
+                </div>
+
+                <div class="performance-card-footer">
+                    <span>{{ item.Evaluation_Set|default('Held-out test') }}</span>
+                    {% if item.Threshold is defined %}
+                        <span>Threshold <strong>{{ "%.2f"|format(item.Threshold) }}</strong></span>
+                    {% endif %}
+                </div>
+            </article>
+        {% else %}
+            <div class="empty-state empty-state-wide">
+                <span class="empty-icon" aria-hidden="true">▥</span>
+                <h3>Performance data unavailable</h3>
+                <p>Train and evaluate a model to populate this comparison.</p>
+            </div>
+        {% endfor %}
+    </section>
+{% endblock %}

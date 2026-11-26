@@ -1,0 +1,10 @@
+{
+    "model": "Bangla Optimized SVM (Unicode-aware)",
+    "threshold": 0.0,
+    "validation_fake_precision": 0.6579520697167756,
+    "validation_fake_recall": 0.5623836126629422,
+    "validation_fake_f1": 0.606425702811245,
+    "positive_class": "Fake",
+    "selection_method": "balanced_decision",
+    "precision_floor": 0.6
+}

@@ -1,0 +1,18 @@
+{
+    "model": "csebuetnlp/banglabert",
+    "accuracy": 0.7374413931681179,
+    "fake_precision": 0.6997245179063361,
+    "fake_recall": 0.4730353817504655,
+    "fake_f1": 0.5644444444444444,
+    "threshold": 0.35,
+    "confusion_matrix": [
+        [
+            254,
+            283
+        ],
+        [
+            109,
+            847
+        ]
+    ]
+}
