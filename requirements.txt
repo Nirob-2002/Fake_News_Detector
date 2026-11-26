@@ -6,6 +6,7 @@ scikit-learn
 nltk
 joblib
 Flask
+streamlit
 scipy
 torch
 transformers
