@@ -74,7 +74,7 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
-Streamlit opens the app at `http://localhost:8501`. Streamlit Community Cloud should use `app.py` as the app's main file.
+Streamlit opens the app at `http://localhost:8501`. Streamlit Community Cloud should use `app.py` as the app's main file and Python 3.12 in the app's Advanced settings. TensorFlow is not installed on Python 3.14 or newer, so the English detector uses Logistic Regression on those versions.
 
 To run the optional Flask interface instead:
 ```bash
@@ -82,7 +82,7 @@ python flask_app.py
 ```
 Open `http://127.0.0.1:5000`.
 
-The fine-tuned BanglaBERT weight file is larger than GitHub's 100 MiB file limit and is not included in this repository. Without that file, Bangla analysis uses the optimized SVM fallback. English analysis uses BiLSTM when TensorFlow is available and otherwise falls back to Logistic Regression.
+The English and Bangla BiLSTM weights are tracked in this repository. Streamlit Community Cloud must use Python 3.12 (select it in the app's Advanced settings), because TensorFlow is not available on Python 3.14 or newer and `requirements.txt` excludes it there. The fine-tuned BanglaBERT weight file is larger than GitHub's 100 MiB file limit and is not included; without that file, Bangla analysis uses the optimized SVM fallback. English analysis uses BiLSTM when TensorFlow is available and otherwise falls back to Logistic Regression.
 
 ---
 
