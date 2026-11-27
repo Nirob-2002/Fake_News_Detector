@@ -237,7 +237,7 @@ if tf is None:
 bangla_bert_model = None
 bangla_bert_tokenizer = None
 
-if (BANGLA_BERT_DIR / "config.json").exists():
+if (BANGLA_BERT_DIR / "model.safetensors").exists():
     try:
         from transformers import AutoTokenizer, AutoModelForSequenceClassification
         import torch
@@ -248,6 +248,8 @@ if (BANGLA_BERT_DIR / "config.json").exists():
         print("BanglaBERT loaded successfully!")
     except Exception as exc:
         print(f"Notice: Could not load BanglaBERT ({exc}). Using Bangla SVM as active engine.")
+else:
+    print("BanglaBERT weights are unavailable; using the optimized SVM.")
 
 bangla_bert_threshold = 0.35
 if (BANGLA_BERT_RESULT_DIR / "banglabert_metrics.json").exists():
